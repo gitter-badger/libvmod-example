@@ -1,8 +1,9 @@
 #!/bin/bash -x
 set -e
 REL=$(basename `git rev-parse --show-toplevel`)
+BRANCH=$(git branch | grep "*" | sed "s/* //")
 
 RPMDIR=$(rpm --eval "%{_topdir}")
 TOFILE="$RPMDIR/SOURCES/${REL}.tar.gz"
 
-git archive --prefix ${REL}/ --format tar master | gzip > $TOFILE
+git archive --prefix ${REL}/ --format tar ${BRANCH} | gzip > $TOFILE
