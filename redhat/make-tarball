@@ -1,0 +1,8 @@
+#!/bin/bash -x
+set -e
+REL=$(basename `git rev-parse --show-toplevel`)
+
+RPMDIR=$(rpm --eval "%{_topdir}")
+TOFILE="$RPMDIR/SOURCES/${REL}.tar.gz"
+
+git archive --prefix ${REL}/ --format tar master | gzip > $TOFILE
