@@ -7,9 +7,11 @@ Group: System Environment/Daemons
 # for now, lets build i386 and x86_64 explicitly.
 #BuildArch: noarch
 #URL: http://github.com/varnish/varnish-agent/
-Source0: ./%{name}-master.tar.gz
+#Source0: ./%{name}.tar.gz
+Source0: ./libvmod-example.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Requires: varnish > 3.0
+BuildRequires: make, autoconf, automake, libtool, python-docutils
 # you need EPEL
 #Requires: perl-Log-Log4perl
 #Requires: perl-Digest-SHA
@@ -28,22 +30,15 @@ libvmod-example
 
 %build
 ./autogen.sh
-# this is a hack and assumes a prebuild copy of varnish in VARNISHDIR.
-./configure VARNISHDIR=$HOME/varnish-cache/ VMODDIR=/opt/
+# this is a hack and assumes a prebuilt copy of varnish in VARNISHSRC.
+./configure VARNISHSRC=$HOME/varnish-cache/ VMODDIR=/usr/lib64/varnish/vmods/ --prefix=/usr/
 make
 
 %install
-#make install DESTDIR=%{buildroot}
+make install DESTDIR=%{buildroot}
 mkdir -p %{buildroot}/usr/share/doc/%{name}/ 
-cp README %{buildroot}/usr/share/doc/%{name}/
-
-mkdir -p %{buildroot}/etc/sysconfig/
-cp redhat/vstatd.sysconfig      %{buildroot}/etc/sysconfig/vstatd
-cp redhat/vstatdprobe.sysconfig %{buildroot}/etc/sysconfig/vstatdprobe
-
-mkdir -p %{buildroot}/etc/init.d/
-cp redhat/vstatd.initrc      %{buildroot}/etc/init.d/vstatd
-cp redhat/vstatdprobe.initrc %{buildroot}/etc/init.d/vstatdprobe
+cp README.rst %{buildroot}/usr/share/doc/%{name}/
+cp COPYING %{buildroot}/usr/share/doc/%{name}/
 
 #mkdir -p %{buildroot}/usr/sbin/ 
 #mv %{buildroot}/usr/local/sbin/* %{buildroot}/usr/sbin/
@@ -76,13 +71,15 @@ rm -rf %{buildroot}
 %files
 %defattr(-,root,root,-)
 #%{_sbindir}/vstatd
+# /opt/varnish/lib/varnish/vmods/
+/usr/lib64/varnish/vmods/
 %doc /usr/share/doc/%{name}/*
 
 #%{_libdir}/varnish
 #%{_var}/lib/varnish-agent
 #%{_var}/log/varnish
 #%{_mandir}/man1/*.1*
-#%{_mandir}/man3/*.3*
+%{_mandir}/man3/*.3*
 #%{_mandir}/man7/*.7*
 #%doc /usr/share/doc/varnish-agent/*
 
